@@ -1,0 +1,27 @@
+# --- API ---
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+
+# --- Neo4j ---
+neo4j
+
+# --- LangChain (core + integrations) ---
+langchain
+langchain-community
+langchain-openai
+
+# --- Embeddings / LLM clients (pick what you use) ---
+openai
+ollama
+
+# --- Data loading / utils ---
+pandas
+
+# --- Tokenization (helpful for chunk sizing) ---
+tiktoken
+
+# --- Optional but useful (logging, retries, http calls) ---
+httpx
+tenacity
