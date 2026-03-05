@@ -13,16 +13,23 @@ LangChain does: embedding + retrieval (vector + Cypher) + LLM answering
 FastAPI exposes: /ingest, /query, /health
 
 ### 2) Suggested project structure
+## Project Structure
+
+```text
 app/
-  main.py                # FastAPI routes
-  config.py              # env vars (neo4j url/user/pwd, model, etc.)
-  neo4j_client.py        # driver + helper run_cypher()
-  ingest.py              # load sample data -> nodes/edges -> chunks -> embeddings -> vector index
-  retriever.py           # hybrid retrieval (vector top-k + graph expansion)
-  rag_chain.py           # build prompt + call LLM + return answer + sources
-  schemas.py             # Pydantic request/response models
+  main.py                # FastAPI endpoints (API routes)
+  config.py              # Configuration + environment variables (Neo4j URL/user/password, model, etc.)
+  neo4j_client.py        # Neo4j driver wrapper + helper methods (e.g., run_cypher())
+  ingest.py              # Ingestion pipeline: load sample data → build nodes/edges → chunk text → create embeddings → store vector index
+  retriever.py           # Hybrid retrieval: vector top-k search + graph expansion (Neo4j traversal)
+  rag_chain.py           # RAG pipeline: build prompt → call LLM → return answer + sources
+  schemas.py             # Pydantic request/response models (API contracts)
+
 data/
-  sample.csv / sample.json / sample.txt
+  sample.csv             # Sample structured dataset (CSV)
+  sample.json            # Sample structured dataset (JSON)
+  sample.txt             # Sample unstructured dataset (text)
+```  
 
 ### 3) Checklist plan (build in this order)
 ### Step 1 — Setup & connectivity
