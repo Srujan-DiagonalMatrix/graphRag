@@ -78,3 +78,27 @@ Add simple logging + timing in the response.
 POST /ingest → loads sample data, builds graph, chunks, embeddings, vector index
 POST /query → {question, top_k=5, hops=1} → returns answer + sources
 GET /health → checks Neo4j connection + index exists
+
+
+### Start Neo4j
+docker run -d --name neo4j-rag \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/password123 \
+  -v neo4j_data:/data \
+  -v neo4j_logs:/logs \
+  neo4j:5
+
+### running docker
+docker ps
+docker logs neo4j-rag --tail 50
+
+### Test endpoints
+curl -s http://127.0.0.1:8000/health | jq
+
+curl -s -X POST http://127.0.0.1:8000/ingest \
+  -H "Content-Type: application/json" \
+  -d '{"files": null, "chunk_size": 800, "chunk_overlap": 120}' | jq
+
+curl -s -X POST http://127.0.0.1:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What is in the sample data?", "top_k": 5, "hops": 1}' | jq
