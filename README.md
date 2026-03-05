@@ -4,7 +4,7 @@ This is a project of GraphRAG, where you search semi-structured (vectors) and st
 # Plan
 Short & Simple MVP plan (Neo4j + LangChain + FastAPI + sample data) that you can build in small steps.
 
-# 1) MVP architecture (what you’re building)
+## 1) MVP architecture (what you’re building)
 
 Neo4j stores:
 Graph = entities + relationships (structured)
