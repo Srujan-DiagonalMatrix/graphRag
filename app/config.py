@@ -23,6 +23,7 @@ class Settings:
     # Embeddings
     OLLAMA_EMBEDDINGS=os.getenv("OLLAMA_EMBEDDINGS")
     LLM_PROVIDER=os.getenv("LLM_PROVIDER")
+    EMBEDDINGS_PROVIDER=os.getenv("EMBEDDINGS_PROVIDER")
 
     # OpenAI
     OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
