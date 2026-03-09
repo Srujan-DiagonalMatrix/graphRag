@@ -1,13 +1,13 @@
 from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from neo4j_client import Neo4jClient
+from app.neo4j_client import Neo4jClient
 
 from app.schemas import (HealthResponse, IngestRequest, IngestResponse, Queryrequest, SourceItem, QueryResponse)
 from app.config import settings
 from app.ingest import ingest_to_neo4j
 from app.retriever import vector_retrieve, graph_expand, build_context_pack
-from rag_chain import get_embeddings, answer_question
+from app.rag_chain import get_embeddings, answer_question
 
 app = FastAPI(title="GraphRAG MVP", version="0.1.0")
 

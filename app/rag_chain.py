@@ -2,10 +2,10 @@ from __future__ import annotations
 from functools import lru_cache
 
 from app.config import settings
+
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
-
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 @lru_cache(maxsize=1)
