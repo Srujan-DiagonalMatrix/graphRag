@@ -33,7 +33,7 @@ def vector_retrieve(neo4j: Neo4jClient, question: str, top_k: int) -> list[Retri
 
     out: list[RetrieveChunk] = []
 
-    for row in out:
+    for row in rows:
         out.append(RetrieveChunk(
             chunk_id=row.get("chunk_id"),
             entity_id=row.get("entity_id"),
@@ -47,20 +47,24 @@ def graph_expand(neo4j: Neo4jClient, seed_chunk_ids: list[str], hops: int, limit
     if not seed_chunk_ids or hops <= 0:
         return []
 
-    rows = neo4j.run_cypher(
-        f"""
-        MATCH (c:Chunk)
-        WHERE c.id IN $chunk_ids
-        MATCH (e:Entity)-[:HAS_CHUNK]->(c)
-        MATCH p=(e)-[:RELATED_TO*1..$hops]->(x:Entity)
-        RETURN
-          [n IN nodes(p) | {id: n.id, title: n.title, label: n.label}] AS nodes,
-          [r IN relationships(p) | {type: r.rel_type}] AS rels
-        LIMIT $limit
-        """,
-        {"chunk_ids": seed_chunk_ids, "hops": hops, "limit": limit_paths},
-    )
+    hops = int(hops)
+    limit_paths = int(limit_paths)
 
+    query = f"""
+    MATCH (c:Chunk)
+    WHERE c.id IN $chunk_ids
+    MATCH (e:Entity)-[:HAS_CHUNK]->(c)
+    MATCH p=(e)-[:RELATED_TO*1..{hops}]->(x:Entity)
+    RETURN
+      [n IN nodes(p) | {{id: n.id, title: n.title, label: n.label}}] AS nodes,
+      [r IN relationships(p) | {{type: r.rel_type}}] AS rels
+    LIMIT $limit
+    """
+
+    rows = neo4j.run_cypher(
+        query,
+        {"chunk_ids": seed_chunk_ids, "limit": limit_paths},
+    )
     return rows
 
 
