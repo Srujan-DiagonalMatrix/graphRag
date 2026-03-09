@@ -28,8 +28,15 @@ def health() -> HealthResponse:
 
     try:
         ok = db.ping()
-        idx = db.vector_index_exists(settings.VECTOR_INDEX_NAME)        
-        return HealthResponse(ok=ok,neo4j=ok,vector_index=idx, message="Neo4j is reachable" if ok else "Neo4j is not reachable.")
+        index_name = getattr(settings, "VECTOR_INDEX_NAME","chunk_vector_index")
+        
+        try:
+            idx_ok = db.vector_index_exists(index_name)  
+        except Exception:
+            idx_ok = False
+
+        return HealthResponse(ok=ok,neo4j=ok,vector_index=idx_ok, message="Neo4j is reachable" if ok else "Neo4j is not reachable.")
+
     finally:
         db.close()
 
@@ -46,15 +53,17 @@ def ingest(req: IngestRequest) -> IngestResponse:
                         chunk_overlap=req.chunk_overlap)
         
         return IngestResponse(ok=True,
-                              entitles_created=result["entitles_created"],
+                              entitles_created=result["entities_created"],
                               relationships_created=result["relationships_created"],
                               chunks_created=result["chunks_created"],
                               embedding_dim=result["embedding_dim"],
                               vector_index=result["vector_index"],
                               message="Ingestion completed")
 
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=400, headers=str(e))
     except Exception as e:
-        raise HTTPException()
+        raise HTTPException(status_code=500, detail=f"Ingest failed: {type(e).__name__}: {e}")
     finally:
         db.close()
 
@@ -84,9 +93,7 @@ def query(req: Queryrequest) -> QueryResponse:
                              used_top_k=req.top_k,
                              used_hops=req.hops)
 
-    except Exception:
-        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Query failed {e}")
+        raise HTTPException(status_code=500, detail=f"Query failed: {type(e).__name__}: {e}")
     finally:
         db.close()

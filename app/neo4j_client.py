@@ -11,7 +11,7 @@ class Neo4jClient:
     def __init__(self) -> None:
         self._driver = GraphDatabase.driver(
             settings.NEO4J_URI,
-            auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
+            auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD),
         )
     
     def close(self) -> None:
@@ -19,7 +19,7 @@ class Neo4jClient:
     
 
     def run_cypher(self, query: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
-        with self._driver.session as session:
+        with self._driver.session() as session:
             records = session.run(query, params or {})
             return [record.data() for record in records]
     
@@ -28,7 +28,8 @@ class Neo4jClient:
         try:
             self.run_cypher("RETURN 1 AS ok")        
             return True
-        except Exception:
+        except Exception as e:
+            print("NEO4J PING FAILED: ", repr(e))
             return False
     
 

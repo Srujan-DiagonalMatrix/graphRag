@@ -43,18 +43,51 @@ def _simple_chunk(text:str, chunk_size:int, overlap:int) -> list[str]:
         if len(text) == chunk_end:
             break # If chunk is empty
         chunk_start = max(0, chunk_end - overlap) # chunk start gets updated.
+    
+    return chunk
 
 def _load_csv(path: str) -> tuple[list[ParsedEntity], list[ParsedRelation]]:
     df = pd.read_csv(path)
     df.columns = [col.strip() for col in df.columns]
 
-    entities = list[ParsedEntity]
-    relations = list[ParsedRelation]
+    entities = list[ParsedEntity] = []
+    relations = list[ParsedRelation] = []
+
+    # ---- Mode A: record_type CSV (Entity / Rel) --
+    if "record_type" in df.columns:
+        for _, row in df.iterrows():
+            rt = str((row.get("record_type") or "")).strip().upper()
+
+            if rt == "ENTITY":
+                entity_id = str(row.get("id") or "").strip()
+
+                if not entity_id:
+                    continue
+
+                label = str(row.get("label") or "item").strip()
+                title = str(row.get("title") or row.get("name" or entity_id)).strip()
+                text = str(row.get("text") or row.get("description") or title).strip()
+                entities.append(ParsedEntity(entity_id, label, title, text))
+
+            elif rt == "REL":
+                s = str(row.get("source_id") or "").strip()
+                r = str(row.get("rel_type") or "").strip()
+                d = str(row.get("target_id") or "").strip()
+                if s and r and d:
+                    relations.append(ParsedRelation(s,r,d))
+            
+        return entities, relations
+
+
+    # ---- Mode B: simple CSV
+    if "id" not in df.columns:
+        return entities, relations
 
     for _, row in df.iterrows():
-        if not "id" in df.columns:
+        entity_id = str(row.get("id") or "").strip()
+        if not entity_id:
             continue
-        entity_id = str(row.get("id"))
+
         label = str(row.get("label") or row.get("type") or "item")
         title = str(row.get("title") or row.get("name") or entity_id)
         text = str(row.get("text") or row.get("description") or title)
@@ -74,7 +107,7 @@ def _load_csv(path: str) -> tuple[list[ParsedEntity], list[ParsedRelation]]:
 
 def _load_json(path: str) -> tuple[list[ParsedEntity], list[ParsedRelation]]:
     
-    with open(file=path, mode="r") as f:
+    with open(file=path, mode="r", encoding="utf-8") as f:
         data = json.load(f)
 
     entities: list[ParsedEntity] = []
@@ -96,18 +129,19 @@ def _load_json(path: str) -> tuple[list[ParsedEntity], list[ParsedRelation]]:
             lable = str(obj.get("lable") or obj.get("type") or "item")
             title = str(obj.get("title") or obj.get("name") or entity_id)
             text = str(obj.get("text") or obj.get("description") or title)
-            entities.append(ParsedEntity(entity_id, label, title, text))
+            entities.append(ParsedEntity(entity_id, lable, title, text))
         
         for obj in data.get["relationships", []]:
-            s = str(obj.get("src_id") or obj.get("source"))
-            t = str(obj.get("rel_type") or obj.get("type"))
-            d = str(obj.get("dst_id") or obj.get("target"))
+            s = str(obj.get("src_id") or obj.get("source") or obj.get("source_id") or "")
+            t = str(obj.get("rel_type") or obj.get("type") or "")
+            d = str(obj.get("dst_id") or obj.get("target") or obj.get("target_id") or "")
             if pd.notna(s) and pd.notna(t) and pd.notna(d):
                 relations.append(ParsedRelation(s,t,d))
         
         return entities, relations
+    return entities, relations
 
-def _load_text(path: str) -> tuple[tuple[ParsedEntity], list[ParsedRelation]]:
+def _load_text(path: str) -> tuple[list[ParsedEntity], list[ParsedRelation]]:
 
     with open(path,"r", encoding="utf-8") as f:
         text = f.read()

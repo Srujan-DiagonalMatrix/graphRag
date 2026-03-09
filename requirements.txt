@@ -3,6 +3,7 @@ fastapi
 uvicorn[standard]
 pydantic
 python-dotenv
+pydantic-settings
 
 # --- Neo4j ---
 neo4j
