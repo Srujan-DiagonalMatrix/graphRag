@@ -93,3 +93,10 @@ uvicorn app.main:app --reload --port 8000
 
 ## Fast API url:
 http://127.0.0.1:8000/docs
+
+
+### Questions you could ask
+1. Which movies did Keanu Reeves act in?
+2. What is the Matrix about?
+3. Which movies are set in Los Angeles?
+4. Tell me movies connected to Artificial Reality and who acted in them.
