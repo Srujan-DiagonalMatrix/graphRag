@@ -11,9 +11,10 @@ from app.rag_chain import get_embeddings, answer_question
 
 app = FastAPI(title="GraphRAG MVP", version="0.1.0")
 
-app.middleware(
+app.add_middleware(
     CORSMiddleware,
-    allow_origin=["*"],
+    allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
 )

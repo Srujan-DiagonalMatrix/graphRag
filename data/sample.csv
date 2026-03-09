@@ -1,0 +1,19 @@
+record_type,id,label,name,description,source_id,rel_type,target_id
+ENTITY,m1,Movie,The Matrix,"A computer hacker learns the true nature of reality and fights against machines.",,, 
+ENTITY,m2,Movie,John Wick,"An ex-hitman comes out of retirement after a personal tragedy.",,, 
+ENTITY,m3,Movie,Speed,"A bomb is planted on a bus that will explode if it drops below a certain speed.",,, 
+ENTITY,p1,Person,Keanu Reeves,"Actor known for action and sci-fi films.",,, 
+ENTITY,p2,Person,Laurence Fishburne,"Actor known for The Matrix and many other films.",,, 
+ENTITY,p3,Person,Carrie-Anne Moss,"Actor known for playing Trinity in The Matrix.",,, 
+ENTITY,p4,Person,Sandra Bullock,"Actor known for Speed and other films.",,, 
+ENTITY,loc1,Location,Los Angeles,"City in California, USA.",,, 
+ENTITY,topic1,Topic,Artificial Reality,"Themes about simulated reality and perception.",,, 
+REL,,,,,p1,ACTED_IN,m1
+REL,,,,,p2,ACTED_IN,m1
+REL,,,,,p3,ACTED_IN,m1
+REL,,,,,p1,ACTED_IN,m2
+REL,,,,,p1,ACTED_IN,m3
+REL,,,,,p4,ACTED_IN,m3
+REL,,,,,m1,HAS_TOPIC,topic1
+REL,,,,,m2,SET_IN,loc1
+REL,,,,,m3,SET_IN,loc1

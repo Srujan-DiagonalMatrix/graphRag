@@ -1,0 +1,69 @@
+{
+  "entities": [
+    {
+      "id": "m1",
+      "label": "Movie",
+      "name": "The Matrix",
+      "description": "A computer hacker learns the true nature of reality and fights against machines."
+    },
+    {
+      "id": "m2",
+      "label": "Movie",
+      "name": "John Wick",
+      "description": "An ex-hitman comes out of retirement after a personal tragedy."
+    },
+    {
+      "id": "m3",
+      "label": "Movie",
+      "name": "Speed",
+      "description": "A bomb is planted on a bus that will explode if it drops below a certain speed."
+    },
+    {
+      "id": "p1",
+      "label": "Person",
+      "name": "Keanu Reeves",
+      "description": "Actor known for action and sci-fi films."
+    },
+    {
+      "id": "p2",
+      "label": "Person",
+      "name": "Laurence Fishburne",
+      "description": "Actor known for The Matrix and many other films."
+    },
+    {
+      "id": "p3",
+      "label": "Person",
+      "name": "Carrie-Anne Moss",
+      "description": "Actor known for playing Trinity in The Matrix."
+    },
+    {
+      "id": "p4",
+      "label": "Person",
+      "name": "Sandra Bullock",
+      "description": "Actor known for Speed and other films."
+    },
+    {
+      "id": "loc1",
+      "label": "Location",
+      "name": "Los Angeles",
+      "description": "City in California, USA."
+    },
+    {
+      "id": "topic1",
+      "label": "Topic",
+      "name": "Artificial Reality",
+      "description": "Themes about simulated reality and perception."
+    }
+  ],
+  "relationships": [
+    { "source_id": "p1", "type": "ACTED_IN", "target_id": "m1" },
+    { "source_id": "p2", "type": "ACTED_IN", "target_id": "m1" },
+    { "source_id": "p3", "type": "ACTED_IN", "target_id": "m1" },
+    { "source_id": "p1", "type": "ACTED_IN", "target_id": "m2" },
+    { "source_id": "p1", "type": "ACTED_IN", "target_id": "m3" },
+    { "source_id": "p4", "type": "ACTED_IN", "target_id": "m3" },
+    { "source_id": "m1", "type": "HAS_TOPIC", "target_id": "topic1" },
+    { "source_id": "m2", "type": "SET_IN", "target_id": "loc1" },
+    { "source_id": "m3", "type": "SET_IN", "target_id": "loc1" }
+  ]
+}
