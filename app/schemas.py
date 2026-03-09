@@ -7,7 +7,7 @@ class HealthResponse(BaseModel):
     ok: bool
     neo4j: bool
     message: str
-    vector_index: int | None = None
+    vector_index: bool | None = None
 
 class IngestRequest(BaseModel):
     files: list[str] | None = None
@@ -20,7 +20,7 @@ class IngestResponse(BaseModel):
     relationships_created: int
     chunks_created: int
     embedding_dim: int
-    vector_index: int
+    vector_index: str
     message: str
 
 class Queryrequest(BaseModel):

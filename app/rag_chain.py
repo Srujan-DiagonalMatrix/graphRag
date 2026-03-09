@@ -6,12 +6,12 @@ from app.config import settings
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI, AzureChatOpenAI
 
 @lru_cache(maxsize=1)
 def get_embeddings():
-    if settings.EMBEDDINGS_PROVIDER == "ollama":
-        return OllamaEmbeddings(model=settings.EMBEDDINGS_PROVIDER, base_url=settings.OLLAMA_BASE_URL)
+    if settings.EMBEDDINGS_PROVIDER.lower() == "ollama":
+        return OllamaEmbeddings(model=settings.OLLAMA_EMBED_MODEL, base_url=settings.OLLAMA_BASE_URL)
     
     if not settings.OPENAI_API_KEY:
         raise RuntimeError("OpenAI Embeddings key is not provided.")
@@ -19,11 +19,37 @@ def get_embeddings():
 
 @lru_cache(maxsize=1)
 def get_llm():
-    if settings.LLM_PROVIDER.lower() == "ollama":
+
+    provider = settings.LLM_PROVIDER.lower()
+
+    if provider == "ollama":
         return ChatOllama(base_url=settings.OLLAMA_BASE_URL, model=settings.OLLAMA_CHAT_MODEL)
-    if not settings.OPENAI_API_KEY:
-        raise RuntimeError("OpenAI API is not provided for LLM")
-    return ChatOpenAI(model=settings.OPENAI_CHAT_MODEL, api_key=settings.OPENAI_API_KEY, temperature=0)
+    
+    if provider == "openai":
+        if not settings.OPENAI_API_KEY:
+            raise RuntimeError("OPENAI_API_KEY is not provided by LLM.")
+        
+        base_url = (settings.OPENAI_BASE_URL or "").rstrip("/")
+
+        if "openai.azure.com" in base_url:
+            if not settings.AZURE_OPENAI_API_VERSION:
+                raise RuntimeError("AZURE_OPENAI_API_VERSION is a required value and missing.")
+            if not settings.OPENAI_CHAT_MODEL:
+                raise RuntimeError("OPENAI_CHAT_MODEL must be your azure deployment model.")
+            
+            return AzureChatOpenAI(azure_endpoint=base_url, 
+                                   api_version=settings.AZURE_OPENAI_API_VERSION, 
+                                   azure_deployment=settings.OPENAI_CHAT_MODEL, 
+                                   temperature=0, 
+                                   api_key=settings.OPENAI_API_KEY)
+        
+        return ChatOpenAI(model=settings.OPENAI_CHAT_MODEL, 
+                          temperature=0, 
+                          base_url=base_url, 
+                          api_key=settings.OPENAI_API_KEY)
+    
+    raise RuntimeError(f"Unknown LLM provider: {settings.LLM_PROVIDER}")
+
 
 def answer_question(question: str, context_pack: str) -> str:
     llm = get_llm()

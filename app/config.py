@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     OPENAI_BASE_URL: str | None = None
     OPENAI_EMBED_MODEL:str | None = None  #=os.getenv("OPENAI_EMBED_MODEL")
     OPENAI_CHAT_MODEL: str | None = None   #=os.getenv("OPENAI_CHAT_MODEL")
+    AZURE_OPENAI_API_VERSION: str | None = None
 
     # Ollama
     OLLAMA_EMBEDDINGS: str | None = None

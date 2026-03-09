@@ -50,8 +50,8 @@ def _load_csv(path: str) -> tuple[list[ParsedEntity], list[ParsedRelation]]:
     df = pd.read_csv(path)
     df.columns = [col.strip() for col in df.columns]
 
-    entities = list[ParsedEntity] = []
-    relations = list[ParsedRelation] = []
+    entities: list[ParsedEntity] = []
+    relations: list[ParsedRelation] = []
 
     # ---- Mode A: record_type CSV (Entity / Rel) --
     if "record_type" in df.columns:
@@ -115,27 +115,26 @@ def _load_json(path: str) -> tuple[list[ParsedEntity], list[ParsedRelation]]:
 
     if isinstance(data, list):
         for obj in data:
-            entity_id = str((obj.get("id") or obj.get("entity_id") or uuid.uuid4().hex))
+            entity_id = str(obj.get("id") or obj.get("entity_id") or uuid.uuid4().hex)
             label = str(obj.get("label") or obj.get("type") or "item")
             title = str(obj.get("title") or obj.get("name") or entity_id)
             text = str(obj.get("text") or obj.get("description") or title)
             entities.append(ParsedEntity(entity_id, label, title, text))
-
-            return entities, relations
+        return entities, relations
     
     if isinstance(data, dict):
         for obj in data.get("entities", []):
             entity_id = str(obj.get("id") or obj.get("entity_id") or uuid.uuid4().hex)
-            lable = str(obj.get("lable") or obj.get("type") or "item")
+            label = str(obj.get("label") or obj.get("type") or "item")
             title = str(obj.get("title") or obj.get("name") or entity_id)
             text = str(obj.get("text") or obj.get("description") or title)
-            entities.append(ParsedEntity(entity_id, lable, title, text))
+            entities.append(ParsedEntity(entity_id, label, title, text))
         
-        for obj in data.get["relationships", []]:
-            s = str(obj.get("src_id") or obj.get("source") or obj.get("source_id") or "")
-            t = str(obj.get("rel_type") or obj.get("type") or "")
-            d = str(obj.get("dst_id") or obj.get("target") or obj.get("target_id") or "")
-            if pd.notna(s) and pd.notna(t) and pd.notna(d):
+        for obj in data.get("relationships", []):
+            s = str(obj.get("src_id") or obj.get("source") or obj.get("source_id") or "").strip()
+            t = str(obj.get("rel_type") or obj.get("type") or "").strip()
+            d = str(obj.get("dst_id") or obj.get("target") or obj.get("target_id") or "").strip()
+            if s and t and d:
                 relations.append(ParsedRelation(s,t,d))
         
         return entities, relations
@@ -211,7 +210,7 @@ def ingest_to_neo4j(
             MATCH (a:Entity {id: $src}), (b:Entity {id: $dst})
             MERGE (a)-[rel:RELATED_TO {rel_type: $type}]->(b)
             """,
-            {"src": r.src_id, "dst": r.dst_id, "type": r.rel_type},
+            {"src": r.src_id, "dst": r.dest_id, "type": r.rel_type},
         )
         rel_created += 1
 
